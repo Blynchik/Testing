@@ -1,4 +1,4 @@
-package org.example;
+package com.dmdev.junit.service;
 
 /**
  * Hello world!
