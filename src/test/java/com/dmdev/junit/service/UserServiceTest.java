@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 // каждый раз объект этого класса пересоздается заново
@@ -24,12 +25,12 @@ public class UserServiceTest {
     private UserService userService;
 
     @BeforeAll
-    static void init(){
+    static void init() {
         System.out.println("Before all: ");
     }
 
     @BeforeEach
-    void prepare(){
+    void prepare() {
         System.out.println("Before each: " + this);
         userService = new UserService();
     }
@@ -46,7 +47,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void userSizeIfUserAdded(){
+    void userSizeIfUserAdded() {
         System.out.println("Test 2: " + this);
         userService.add(IVAN);
         userService.add(PETR);
@@ -58,20 +59,31 @@ public class UserServiceTest {
     }
 
     @Test
-    void loginSuccessIfUserExists(){
+    void loginSuccessIfUserExists() {
         userService.add(IVAN);
         userService.add(PETR);
         Optional<User> maybeUser = userService.login(IVAN.getUsername(), IVAN.getPassword());
 
         //AssertJ
         assertThat(maybeUser).isPresent();
-        maybeUser.ifPresent(user->assertThat(user).isEqualTo(IVAN));
+        maybeUser.ifPresent(user -> assertThat(user).isEqualTo(IVAN));
 //        Assertions.assertTrue(maybeUser.isPresent());
 //        maybeUser.ifPresent(user -> Assertions.assertEquals(IVAN,user));
     }
 
     @Test
-    void usersConvertedToMapById(){
+    void throwExceptionIfUsernameOrPasswordIsNull() {
+        Assertions.assertAll(
+                () -> {
+                    var exception = Assertions.assertThrows(IllegalArgumentException.class, () -> userService.login(null, "dummy"));
+                    assertThat(exception.getMessage()).isEqualTo("username or password is null");
+                },
+                () -> Assertions.assertThrows(IllegalArgumentException.class, () -> userService.login("dummy", null))
+        );
+    }
+
+    @Test
+    void usersConvertedToMapById() {
         userService.add(IVAN, PETR);
 
         Map<Integer, User> users = userService.getAllConvertedById();
@@ -86,7 +98,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void loginFailIfPasswordIsNotCorrect(){
+    void loginFailIfPasswordIsNotCorrect() {
         userService.add(IVAN);
         var maybeUser = userService.login(IVAN.getUsername(), "dummy");
 
@@ -94,7 +106,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void loginFailIfUserDoesNotExist(){
+    void loginFailIfUserDoesNotExist() {
         userService.add(IVAN);
         var maybeUser = userService.login("dummy", IVAN.getPassword());
 
@@ -102,12 +114,12 @@ public class UserServiceTest {
     }
 
     @AfterEach
-    void deleteDataFromDatabase(){
-        System.out.println("After each: "+ this);
+    void deleteDataFromDatabase() {
+        System.out.println("After each: " + this);
     }
 
     @AfterAll
-    static void closeConnectionPool(){
+    static void closeConnectionPool() {
         System.out.println("After all: ");
     }
 }
