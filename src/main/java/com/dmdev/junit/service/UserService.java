@@ -1,9 +1,8 @@
 package com.dmdev.junit.service;
 
-import com.dmdev.junit.service.dto.User;
+import com.dmdev.junit.dto.User;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class UserService {

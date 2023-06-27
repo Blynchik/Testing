@@ -1,6 +1,6 @@
 package com.dmdev.junit.service;
 
-import com.dmdev.junit.service.dto.User;
+import com.dmdev.junit.dto.User;
 import org.junit.jupiter.api.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 // при PER_CLASS объект этого класса создается
 // единожды для всех тестов (в этом случает можно не использовать статик)
 // т.к. уже есть конкретный объект
-class UserServiceTest {
+public class UserServiceTest {
 
     private UserService userService;
 
