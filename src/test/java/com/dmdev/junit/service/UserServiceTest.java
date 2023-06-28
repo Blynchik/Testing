@@ -18,6 +18,13 @@ import static org.assertj.core.api.Assertions.fail;
 // при PER_CLASS объект этого класса создается
 // единожды для всех тестов (в этом случает можно не использовать статик)
 // т.к. уже есть конкретный объект
+@Tag("fast")
+@Tag("user")
+//можно запустить только те тесты, которые помечены тэгом
+//или запустить исключив эти тесты через кастомный лаунчер
+//или командную строку например
+//mvn clean test -DexcludedGroups=login
+//mvn clean test -Dgroups=login
 public class UserServiceTest {
 
     private static final User IVAN = User.of(1, "Ivan", "123");
@@ -59,6 +66,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @Tag("login")
     void loginSuccessIfUserExists() {
         userService.add(IVAN);
         userService.add(PETR);
@@ -72,6 +80,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @Tag("login")
     void throwExceptionIfUsernameOrPasswordIsNull() {
         Assertions.assertAll(
                 () -> {
@@ -98,6 +107,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @Tag("login")
     void loginFailIfPasswordIsNotCorrect() {
         userService.add(IVAN);
         var maybeUser = userService.login(IVAN.getUsername(), "dummy");
@@ -106,6 +116,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @Tag("login")
     void loginFailIfUserDoesNotExist() {
         userService.add(IVAN);
         var maybeUser = userService.login("dummy", IVAN.getPassword());
