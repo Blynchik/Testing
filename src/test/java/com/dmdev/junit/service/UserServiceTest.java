@@ -1,10 +1,12 @@
 package com.dmdev.junit.service;
 
 import com.dmdev.junit.dto.User;
+import com.dmdev.junit.paramresolver.UserServiceParamResolver;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsEmptyCollection;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Map;
 import java.util.Optional;
@@ -29,11 +31,18 @@ import static org.assertj.core.api.Assertions.fail;
 //то тест выполнится в заданном порядке, значения могут быть не последовательными
 //@TestMethodOrder(MethodOrderer.MethodName.class) - в алфавитном порядке
 //@TestMethodOrder(MethodOrderer.DisplayName.class) - в алфавитном порядке названия тестов в отображении с аннотацией @DisplayName
+@ExtendWith({
+        UserServiceParamResolver.class
+})
 public class UserServiceTest {
 
     private static final User IVAN = User.of(1, "Ivan", "123");
     private static final User PETR = User.of(2, "Petr", "111");
     private UserService userService;
+
+    UserServiceTest(TestInfo testInfo){
+        System.out.println();
+    }
 
     @BeforeAll
     static void init() {
@@ -41,9 +50,9 @@ public class UserServiceTest {
     }
 
     @BeforeEach
-    void prepare() {
+    void prepare(UserService userService) {
         System.out.println("Before each: " + this);
-        userService = new UserService();
+        this.userService = userService;
     }
 
     @Test
