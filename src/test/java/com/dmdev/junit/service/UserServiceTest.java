@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -100,6 +101,7 @@ public class UserServiceTest {
 
     @Test
     @Tag("login")
+    @Disabled("check test") //отключает тест
     void loginFailIfPasswordIsNotCorrect() {
         userService.add(IVAN);
         var maybeUser = userService.login(IVAN.getUsername(), "dummy");
@@ -109,7 +111,8 @@ public class UserServiceTest {
 
     @Test
     @Tag("login")
-    void loginFailIfUserDoesNotExist() {
+    @RepeatedTest(value = 5, name = RepeatedTest.LONG_DISPLAY_NAME)//повторяет тест несколько раз(указано)
+    void loginFailIfUserDoesNotExist(RepetitionInfo repetitionInfo) {//repetitionInfo это одна из итераций теста, можно использовать дальше,а можно просто не вводить этот параметр
         userService.add(IVAN);
         var maybeUser = userService.login("dummy", IVAN.getPassword());
 
@@ -144,6 +147,16 @@ public class UserServiceTest {
             maybeUser.ifPresent(user -> assertThat(user).isEqualTo(IVAN));
 //        Assertions.assertTrue(maybeUser.isPresent());
 //        maybeUser.ifPresent(user -> Assertions.assertEquals(IVAN,user));
+        }
+
+        @Test//тест на время
+        void checkLoginFunctionalityPerformance(){
+    //        var result= Assertions.assertTimeout(Duration.ofMillis(200L), ()->{
+            var result = Assertions.assertTimeoutPreemptively(Duration.ofMillis(200L),()->{ //то же самое, просто в другом потоке
+                // а можно просто над любым тестом поставить @Timeout(value = 200, unit = TimeUnit.MILLISECONDS)
+                Thread.sleep(300);
+                return userService.login("dummy", IVAN.getPassword());
+            });
         }
 
         @Test
