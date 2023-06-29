@@ -7,9 +7,12 @@ import org.hamcrest.collection.IsEmptyCollection;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.*;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -40,7 +43,7 @@ public class UserServiceTest {
     private static final User PETR = User.of(2, "Petr", "111");
     private UserService userService;
 
-    UserServiceTest(TestInfo testInfo){
+    UserServiceTest(TestInfo testInfo) {
         System.out.println();
     }
 
@@ -126,9 +129,9 @@ public class UserServiceTest {
     //можно создать внутренний класс, где будут выполняться схожие тесты
     //можно вест класс сделать @Tag("login"), все методы будут с этим тегом
     @Nested
-    //Сообщает, что внутри класса есть тесты, которые нужно выполнить
+            //Сообщает, что внутри класса есть тесты, которые нужно выполнить
             // @DisplayName тоже можно
-    class LoginTest{
+    class LoginTest {
         @Test
         @Tag("login")
         void loginSuccessIfUserExists() {
@@ -172,5 +175,35 @@ public class UserServiceTest {
 
             Assertions.assertTrue(maybeUser.isEmpty());
         }
+
+        @ParameterizedTest(name = "{arguments} test")
+        //  @ArgumentsSource() - принимает ArgumentProvider, который является массивом объектов
+//        @NullSource //все 5 аннотации, являются @ArgumentSource с соответствующим праметром, но работают только с одним аргументом в методе
+//        @EmptySource
+//        @NullAndEmptySource
+//        @ValueSource(strings = {"Ivan", "Petr"})//может принять примитивы, строки, массивы объекты
+        //@EnumSource
+        @MethodSource("com.dmdev.junit.service.UserServiceTest#getArgumentsForLoginTest")//принимает название статического метода или путь к нему
+//        @CsvFileSource(resources = "/login-test-data.csv", delimiter = ',', numLinesToSkip = 1)//можно передавать данные из файла, но тогда в аргументах не нужно Optional<User>, а в теле assertThat...
+//        @CsvSource({
+//                "Ivan,123",
+//                "Petr,111"
+//        })//как прошлая аннотация, но без отдельного файла
+        @DisplayName("login param test")
+        void loginParametrizedTest(String username, String password, Optional<User> user) {
+            userService.add(IVAN, PETR);
+
+            var maybeUser = userService.login(username, password);
+            assertThat(maybeUser).isEqualTo(user);
+        }
+    }
+
+    static Stream<Arguments> getArgumentsForLoginTest() {
+        return Stream.of(
+                Arguments.of("Ivan", "123", Optional.of(IVAN)),
+                Arguments.of("Petr", "111", Optional.of(PETR)),
+                Arguments.of("Petr", "dummy", Optional.empty()),
+                Arguments.of("dummy", "123", Optional.empty())
+        );
     }
 }
