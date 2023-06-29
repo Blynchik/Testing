@@ -1,7 +1,8 @@
 package com.dmdev.junit.service;
 
 import com.dmdev.junit.dto.User;
-import com.dmdev.junit.paramresolver.UserServiceParamResolver;
+import com.dmdev.junit.extension.GlobalExtension;
+import com.dmdev.junit.extension.UserServiceParamResolver;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsEmptyCollection;
 import org.hamcrest.collection.IsMapContaining;
@@ -36,7 +37,8 @@ import static org.assertj.core.api.Assertions.fail;
 //@TestMethodOrder(MethodOrderer.MethodName.class) - в алфавитном порядке
 //@TestMethodOrder(MethodOrderer.DisplayName.class) - в алфавитном порядке названия тестов в отображении с аннотацией @DisplayName
 @ExtendWith({
-        UserServiceParamResolver.class
+        UserServiceParamResolver.class,
+        GlobalExtension.class
 })
 public class UserServiceTest {
 
