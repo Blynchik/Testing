@@ -11,8 +11,8 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.util.Map;
@@ -41,14 +41,20 @@ import static org.assertj.core.api.Assertions.fail;
 //@TestMethodOrder(MethodOrderer.DisplayName.class) - в алфавитном порядке названия тестов в отображении с аннотацией @DisplayName
 @ExtendWith({
         UserServiceParamResolver.class,
-        GlobalExtension.class
+        MockitoExtension.class
+//        GlobalExtension.class
 })
 public class UserServiceTest {
 
     private static final User IVAN = User.of(1, "Ivan", "123");
     private static final User PETR = User.of(2, "Petr", "111");
+    @InjectMocks
     private UserService userService;
+//    @Spy
+    @Mock
     private UserDao userDao;
+    @Captor
+    private ArgumentCaptor<Integer> argumentCaptor;
 
     UserServiceTest(TestInfo testInfo) {
         System.out.println();
@@ -63,8 +69,8 @@ public class UserServiceTest {
     void prepare(UserService userService) {
         System.out.println("Before each: " + this);
 //        this.userDao = Mockito.mock(UserDao.class);
-        this.userDao = Mockito.spy(new UserDao());
-        this.userService = new UserService(userDao);
+//        this.userDao = Mockito.spy(new UserDao());
+//        this.userService = new UserService(userDao);
     }
 
     @Test
@@ -73,7 +79,7 @@ public class UserServiceTest {
         Mockito.doReturn(true).when(userDao).delete(IVAN.getId());
 //        Mockito.when(userDao.delete(IVAN.getId())).thenReturn(true);
         var deleteResult = userService.delete(IVAN.getId());
-        var argumentCaptor = ArgumentCaptor.forClass(Integer.class);
+//        var argumentCaptor = ArgumentCaptor.forClass(Integer.class);
         Mockito.verify(userDao, Mockito.atLeast(2)).delete(argumentCaptor.capture());
         assertThat(argumentCaptor.getValue()).isEqualTo(IVAN.getId());
         assertThat(deleteResult).isTrue();
