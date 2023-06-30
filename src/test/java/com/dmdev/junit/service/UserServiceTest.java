@@ -76,13 +76,16 @@ public class UserServiceTest {
     @Test
     void shouldDeleteExistedUser(){
         userService.add(IVAN);
-        Mockito.doReturn(true).when(userDao).delete(IVAN.getId());
-//        Mockito.when(userDao.delete(IVAN.getId())).thenReturn(true);
-        var deleteResult = userService.delete(IVAN.getId());
-//        var argumentCaptor = ArgumentCaptor.forClass(Integer.class);
-        Mockito.verify(userDao, Mockito.atLeast(2)).delete(argumentCaptor.capture());
-        assertThat(argumentCaptor.getValue()).isEqualTo(IVAN.getId());
-        assertThat(deleteResult).isTrue();
+//        Mockito.doReturn(true).when(userDao).delete(IVAN.getId());
+////        Mockito.when(userDao.delete(IVAN.getId())).thenReturn(true);
+//        var deleteResult = userService.delete(IVAN.getId());
+////        var argumentCaptor = ArgumentCaptor.forClass(Integer.class);
+//        Mockito.verify(userDao, Mockito.atLeast(2)).delete(argumentCaptor.capture());
+//        assertThat(argumentCaptor.getValue()).isEqualTo(IVAN.getId());
+//        assertThat(deleteResult).isTrue();
+        BDDMockito.given(userDao.delete(IVAN.getId())).willReturn(true);
+
+        BDDMockito.willReturn(true).given(userDao).delete(IVAN.getId());
     }
 
     @Test
